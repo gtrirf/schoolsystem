@@ -52,7 +52,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=255, null=True, blank=True)
     phone_number = models.CharField(max_length=15, unique=True)
     username = models.CharField(max_length=150, blank=True, null=True, unique=True)
-    profile_photo = models.ImageField(upload_to='user_images/', blank=True, null=True, default='default_img/img.png')
+    profile_photo = models.ImageField(upload_to='user_images/', default='default_img/img.png')
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
