@@ -7,7 +7,7 @@ from .serializers import (
     LoginSerializer, UserRegistrationSerializer
 )
 from .models import NumberVerification
-from .utils import generate_verification_code
+from .utils import generate_verification_code, send_verification_sms
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework.response import Response
@@ -42,7 +42,7 @@ class PhoneNumberView(APIView):
                         verification_code=verification_code,
                     )
                     message = f'Your verification code is {verification_code}'
-                    # send_verification_sms(phone_number, message)
+                    send_verification_sms(phone_number, message)
 
                     # try:
                     #     send_verification_sms(phone_number, message)
@@ -61,7 +61,7 @@ class PhoneNumberView(APIView):
                     verification.save()
 
                     message = f'your Verification code is {verification_code}'
-                    # send_verification_sms(phone_number, message)
+                    send_verification_sms(phone_number, message)
 
                     # try:
                     #     send_verification_sms(phone_number, message)
@@ -86,7 +86,7 @@ class PhoneNumberView(APIView):
                     verification_code=verification_code,
                 )
                 message = f'Your verification code is {verification_code}'
-                # send_verification_sms(phone_number, message)
+                send_verification_sms(phone_number, message)
 
                 # try:
                 #     send_verification_sms(phone_number, message)
