@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # internal apps
     'accounts',
+    'additions',
     # external apps
     'drf_yasg',
 ]
