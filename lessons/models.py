@@ -31,7 +31,7 @@ class Assignment(models.Model):
         db_table = 'assignment'
 
     def __str__(self):
-        return self.lesson
+        return f'{self.lesson}'
 
 
 class Submission(models.Model):
@@ -47,5 +47,5 @@ class Submission(models.Model):
         db_table = 'submissions'
 
     def __str__(self):
-        return self.student
+        return f'{self.student}'
 

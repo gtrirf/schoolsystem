@@ -22,12 +22,12 @@ class TimeTableForLesson(models.Model):
 
 class TeacherAvailability(models.Model):
     teacher = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    day_of_week = models.ForeignKey(DayOfWeek, on_delete=models.SET_NULL, null=True, blank=True)
+    day_of_week = models.ManyToManyField(DayOfWeek, related_name='work_days', blank=True)
     work_time = models.ForeignKey(Timeslot, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         db_table = 'teachertime'
 
     def __str__(self):
-        return self.teacher
+        return f'{self.teacher}'
 

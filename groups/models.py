@@ -15,7 +15,7 @@ class Grade(models.Model):
 class Group(models.Model):
     name = models.CharField(max_length=100)
     main_teacher = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    Students = models.ManyToManyField(User, related_name='student_of_group', blank=True)
+    students = models.ManyToManyField(User, related_name='student_of_group', blank=True)
     grade = models.ForeignKey(Grade, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
