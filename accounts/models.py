@@ -71,15 +71,20 @@ class User(AbstractBaseUser, PermissionsMixin):
                 )
 
     def save(self, *args, **kwargs):
-        if self.role in [RoleCodes.ADMIN, RoleCodes.STAFF, RoleCodes.DIRECTOR]:
+        if self.role in [RoleCodes.STAFF, RoleCodes.DIRECTOR]:
             self.is_staff = True
         else:
             self.is_staff = False
         if self.role == RoleCodes.ADMIN:
+            self.is_staff = True
             self.is_superuser = True
+
         else:
             self.is_superuser = False
         super().save(*args, **kwargs)
+
+    def get_full_name(self):
+        return f'{self.first_name} {self.last_name}'
 
 
 class NumberVerification(models.Model):

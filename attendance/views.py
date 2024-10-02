@@ -39,12 +39,12 @@ class AttendanceViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        data = request.data  #
+        data = request.data
         lesson_id = data.get('lesson')
         attendances = data.get('attendances', [])
 
         if not lesson_id or not attendances:
-            return Response({"detail": "Lesson ID va o'quvchilar ro'yxati kerak."}, status=400)
+            return Response({"detail": "Lesson ID and students list must be"}, status=400)
 
         try:
             lesson = Lesson.objects.get(id=lesson_id)

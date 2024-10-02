@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'timetable',
     'lessons',
     'attendance',
+    'exams',
     # external apps
     'drf_yasg',
     'rest_framework',
