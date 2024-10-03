@@ -6,10 +6,12 @@ from additions.models import Subject, Timeslot
 
 class Exam(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.SET_NULL, null=True, blank=True)
+    examiner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     classroom = models.ForeignKey(Classroom, on_delete=models.SET_NULL, null=True, blank=True)
     exam_date = models.DateField()
     exam_time = models.ForeignKey(Timeslot, on_delete=models.SET_NULL, null=True, blank=True)
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True)
+    exam_passing_score = models.PositiveIntegerField(default=50)
 
     class Meta:
         db_table = 'exam'
