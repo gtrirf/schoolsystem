@@ -1,7 +1,7 @@
 from django.db import models
-from groups.models import Group, Classroom
-from accounts.models import User
-from additions.models import Subject, Timeslot
+from apps.groups.models import Group, Classroom
+from apps.accounts.models import User
+from apps.additions import Subject, Timeslot
 
 
 class Exam(models.Model):

@@ -1,9 +1,7 @@
-from django.shortcuts import render
 from rest_framework import generics
-from django.shortcuts import get_object_or_404
 from .serializers import EventSerializers
 from .models import Event
-from accounts.permissions import IsAdmin, IsTeacher, IsDirector, IsStaff, IsStudent, IsGuest
+from apps.accounts.permissions import IsAdmin, IsTeacher, IsDirector, IsStaff, IsStudent, IsGuest
 
 
 class EventView(generics.ListCreateAPIView):

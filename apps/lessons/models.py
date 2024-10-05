@@ -1,6 +1,6 @@
 from django.db import models
-from accounts.models import User
-from timetable.models import TimeTableForLesson
+from apps.accounts.models import User
+from apps.timetable.models import TimeTableForLesson
 
 
 class Lesson(models.Model):

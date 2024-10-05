@@ -1,6 +1,6 @@
 from django.db import models
-from groups.models import Classroom
-from additions.models import Timeslot
+from apps.groups.models import Classroom
+from apps.additions import Timeslot
 
 
 class Event(models.Model):

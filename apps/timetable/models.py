@@ -1,7 +1,7 @@
 from django.db import models
-from accounts.models import User
-from additions.models import Timeslot, Subject, DayOfWeek
-from groups.models import Group
+from apps.accounts.models import User
+from apps.additions import Timeslot, Subject, DayOfWeek
+from apps.groups.models import Group
 
 
 class TimeTableForLesson(models.Model):

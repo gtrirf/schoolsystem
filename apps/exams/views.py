@@ -1,12 +1,10 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializers import ExamSerializers, ExamResultSerializers
+from .serializers import ExamSerializers
 from .models import Exam, ExamResult
-from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
-from accounts.permissions import IsStaff, IsAdmin, IsDirector, IsStudent, IsTeacher, IsGuest
-from accounts.models import User, RoleCodes
+from apps.accounts.permissions import IsStaff, IsAdmin, IsDirector, IsStudent, IsTeacher
+from apps.accounts.models import User, RoleCodes
 
 
 class ExamsView(APIView):

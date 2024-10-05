@@ -1,13 +1,11 @@
-from rest_framework import generics, permissions
+from rest_framework import generics
 from .models import Lesson, Assignment, Submission
-from timetable.models import TimeTableForLesson, TeacherAvailability
+from apps.timetable.models import TeacherAvailability
 from .serializers import LessonSerializer, AssignmentSerializer, SubmissionSerializer
 from rest_framework.exceptions import ValidationError
-from django.utils import timezone
-from accounts.permissions import IsTeacher, IsAdmin, IsStaff, IsDirector, IsGuest, IsStudent
+from apps.accounts.permissions import IsTeacher, IsAdmin, IsDirector, IsStudent
 from collections import defaultdict
-from additions.models import Ratings
-import datetime
+from apps.additions import Ratings
 
 
 class LessonCreateView(generics.CreateAPIView):

@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Group, User
 from .serializers import AddStudentsSerializer
-from accounts.permissions import IsStudent, IsStaff, IsAdmin, IsTeacher, IsDirector, IsGuest
+from apps.accounts.permissions import IsStaff, IsAdmin, IsTeacher, IsDirector
 
 
 class GroupListView(generics.ListAPIView):

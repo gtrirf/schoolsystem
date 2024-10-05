@@ -1,11 +1,4 @@
-from rest_framework import viewsets
-from .models import Attendance
-from lessons.models import Lesson
-from groups.models import Group
-from .serializers import StudentAttendanceSerializer
-from rest_framework.response import Response
-from accounts.models import User
-from accounts.permissions import IsTeacher, IsAdmin, IsDirector
+from apps.accounts.permissions import IsTeacher, IsAdmin, IsDirector
 
 from rest_framework import viewsets
 from rest_framework.response import Response

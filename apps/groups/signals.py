@@ -1,7 +1,7 @@
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
-from accounts.models import User, RoleCodes
-from groups.models import Group
+from apps.accounts.models import User, RoleCodes
+from apps.groups.models import Group
 
 
 @receiver(m2m_changed, sender=Group.students.through)

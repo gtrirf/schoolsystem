@@ -1,8 +1,7 @@
-from timetable.serializers import TimeTableForLessonSerializer, TeacherAvailabilitySerializer
-from rest_framework import status
-from .models import TeacherAvailability, TimeTableForLesson
+from apps.timetable.serializers import TimeTableForLessonSerializer
+from .models import TimeTableForLesson
 from rest_framework import generics
-from accounts.permissions import IsStudent, IsStaff, IsAdmin, IsTeacher, IsDirector, IsGuest
+from apps.accounts.permissions import IsStudent, IsAdmin, IsTeacher, IsDirector
 
 
 class StudentTimeTableView(generics.ListAPIView):

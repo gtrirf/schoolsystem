@@ -1,13 +1,10 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import Ratings
-from django.shortcuts import get_object_or_404
 from .serializers import RatingSerializers
 from rest_framework.response import Response
 from rest_framework import status
-from accounts.permissions import IsStaff, IsAdmin, IsDirector, IsStudent, IsTeacher, IsGuest
+from apps.accounts.permissions import IsStaff, IsAdmin, IsDirector, IsStudent, IsTeacher
 from rest_framework.permissions import IsAuthenticated
-from accounts.models import User
 
 
 class RatingView(APIView):

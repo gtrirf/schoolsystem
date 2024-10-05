@@ -2,7 +2,7 @@ from django.conf import settings
 import random
 import string
 from twilio.rest import Client
-from accounts.models import NumberVerification
+from apps.accounts.models import NumberVerification
 from rest_framework.response import Response
 from rest_framework import status
 
