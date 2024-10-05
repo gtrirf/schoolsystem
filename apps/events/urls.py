@@ -1,8 +1,10 @@
-from django.urls import path
-from .views import EventView, EventRetrieveUpdateDestroyAPIView
+from django.urls import path, include
+from .views import EventViewSet
+from rest_framework.routers import DefaultRouter
 
+router = DefaultRouter()
+router.register(r'events', EventViewSet, basename='events')
 
 urlpatterns = [
-    path('events/', EventView.as_view(), name='events'),
-    path('events/<int:pk>/', EventRetrieveUpdateDestroyAPIView.as_view(), name='event-detail')
+    path('', include(router.urls))
 ]

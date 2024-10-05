@@ -5,6 +5,7 @@ from drf_yasg import openapi
 from rest_framework import permissions
 from django.conf import settings
 from django.conf.urls.static import static
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -21,16 +22,25 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('accounts.urls')),
-    path('', include('additions.urls')),
-    path('api/', include('attendance.urls')),
-    path('api/', include('events.urls')),
-    path('api/', include('exams.urls')),
-    path('api/', include('groups.urls')),
-    path('api/', include('lessons.urls')),
-    path('api/', include('timetable.urls')),
+    path('accounts/', include('apps.accounts.urls')),
+    path('', include('apps.additions.urls')),
+    path('api/', include('apps.attendance.urls')),
+    path('api/', include('apps.events.urls')),
+    path('api/', include('apps.exams.urls')),
+    path('api/', include('apps.groups.urls')),
+    path('api/', include('apps.lessons.urls')),
+    path('api/', include('apps.timetable.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path('redoc/', SpectacularRedocView.as_view(), name='schema-redoc'),
+    path("schema/", SpectacularAPIView.as_view(), name="schema"),
+    path(
+        "swagger/",
+        SpectacularSwaggerView.as_view(
+            template_name="swagger-ui.html", url_name="schema"
+        ),
+        name="swagger-ui",
+    ),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

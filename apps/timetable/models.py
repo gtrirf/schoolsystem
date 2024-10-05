@@ -1,6 +1,6 @@
 from django.db import models
 from apps.accounts.models import User
-from apps.additions import Timeslot, Subject, DayOfWeek
+from apps.additions.models import Timeslot, Subject, DayOfWeek
 from apps.groups.models import Group
 
 

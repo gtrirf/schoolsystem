@@ -5,7 +5,7 @@ from .serializers import LessonSerializer, AssignmentSerializer, SubmissionSeria
 from rest_framework.exceptions import ValidationError
 from apps.accounts.permissions import IsTeacher, IsAdmin, IsDirector, IsStudent
 from collections import defaultdict
-from apps.additions import Ratings
+from apps.additions.models import Ratings
 
 
 class LessonCreateView(generics.CreateAPIView):

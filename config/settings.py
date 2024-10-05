@@ -43,14 +43,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # internal apps
-    'accounts',
-    'additions',
-    'groups',
-    'events',
-    'timetable',
-    'lessons',
-    'attendance',
-    'exams',
+    'apps.accounts',
+    'apps.additions',
+    'apps.groups',
+    'apps.events',
+    'apps.timetable',
+    'apps.lessons',
+    'apps.attendance',
+    'apps.exams',
     # external apps
     'drf_yasg',
     'rest_framework',
@@ -73,7 +73,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -114,6 +114,9 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 'PAGE_SIZE': 10,
+    # 'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 SIMPLE_JWT = {
