@@ -8,7 +8,7 @@ class IsGuest(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == RoleCodes.GUEST
+        return request.user.is_authenticated and request.user.role == RoleCodes.objects.get(code='GUEST').code
 
 
 class IsAdmin(permissions.BasePermission):
@@ -17,7 +17,7 @@ class IsAdmin(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == RoleCodes.ADMIN
+        return request.user.is_authenticated and request.user.role == RoleCodes.objects.get(code='ADMIN').code
 
 
 class IsStaff(permissions.BasePermission):
@@ -26,28 +26,31 @@ class IsStaff(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == RoleCodes.STAFF
+        return request.user.is_authenticated and request.user.role == RoleCodes.objects.get(code='STAFF').code
 
 
 class IsStudent(permissions.BasePermission):
     """
-    Allow access to 'user' users.
+    Allow access to 'student' users.
     """
+
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == RoleCodes.STUDENT
+        return request.user.is_authenticated and request.user.role == RoleCodes.objects.get(code='STUDENT').code
 
 
 class IsTeacher(permissions.BasePermission):
     """
-    Allow access to 'user' users.
+    Allow access to 'teacher' users.
     """
+
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == RoleCodes.TEACHER
+        return request.user.is_authenticated and request.user.role == RoleCodes.objects.get(code='TEACHER').code
 
 
 class IsDirector(permissions.BasePermission):
     """
     Allow access to 'director' users.
     """
+
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == RoleCodes.DIRECTOR
+        return request.user.is_authenticated and request.user.role == RoleCodes.objects.get(code='DIRECTOR').code

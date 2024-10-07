@@ -2,16 +2,15 @@ from django.db import models
 from apps.accounts.models import User
 from apps.additions.models import Timeslot, Subject, DayOfWeek
 from apps.groups.models import Group
+from apps.additions.models import TimeCreatedAndUpdated
 
 
-class TimeTableForLesson(models.Model):
+class TimeTableForLesson(TimeCreatedAndUpdated):
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True)
     subject = models.ForeignKey(Subject, on_delete=models.SET_NULL, null=True, blank=True)
     teacher = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     day_of_week = models.ForeignKey(DayOfWeek, on_delete=models.SET_NULL, null=True, blank=True)
     lesson_time = models.ForeignKey(Timeslot, on_delete=models.SET_NULL, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'timetable'

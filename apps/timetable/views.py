@@ -10,7 +10,6 @@ class StudentTimeTableView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         groups = user.student_of_group.all()
-
         return TimeTableForLesson.objects.filter(group__in=groups)
 
     def get_permissions(self):
@@ -23,7 +22,6 @@ class TeacherTimeTableView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-
         return TimeTableForLesson.objects.filter(teacher=user)
                 
     def get_permissions(self):

@@ -1,14 +1,13 @@
 from django.db import models
 from apps.accounts.models import User
 from apps.lessons.models import Lesson
+from apps.additions.models import TimeCreatedAndUpdated
 
 
-class Attendance(models.Model):
+class Attendance(TimeCreatedAndUpdated):
     student = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL, null=True, blank=True)
     status = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'attendances'

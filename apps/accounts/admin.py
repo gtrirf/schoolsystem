@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import User, NumberVerification
+from .models import RoleCodes
+from .models import User, NumberVerification, RoleCodes
 
 
 class CustomUserAdmin(admin.ModelAdmin):
@@ -17,9 +18,14 @@ admin.site.register(User, CustomUserAdmin)
 
 
 class NumberVerificationAdmin(admin.ModelAdmin):
-    list_display = ('verification_code', 'phone_number', 'created_at', 'is_verified')
+    list_display = ('verification_code', 'phone_number', 'created_at', 'updated_at', 'is_verified')
     search_fields = ('verification_code', 'phone_number',)
     list_filter = ('created_at',)
 
 
 admin.site.register(NumberVerification, NumberVerificationAdmin)
+
+
+@admin.register(RoleCodes)
+class RoleCodesAdmin(admin.ModelAdmin):
+    list_display = ('role', 'code')

@@ -29,21 +29,3 @@ def send_verification_sms(to_phone_number, message_body):
     except Exception as e:
         print(f"Exception occurred: {e}")
 
-
-def create_verification(phone_number, verification_code):
-    NumberVerification.objects.create(
-        phone_number=phone_number,
-        verification_code=verification_code,
-    )
-    message = f'Your verification code is {verification_code}'
-    try:
-        send_verification_sms(phone_number, message)
-    except Exception as e:
-        return Response(
-            {'error': "Failed to send verification SMS"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-    return Response(
-        {'message': 'Verification code is sent'},
-        status=status.HTTP_200_OK
-    )

@@ -1,5 +1,4 @@
 from django.db import models
-from apps.accounts.models import User
 
 
 class Subject(models.Model):
@@ -13,7 +12,7 @@ class Subject(models.Model):
 
 
 class Ratings(models.Model):
-    student = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    student = models.ForeignKey('accounts.User', on_delete=models.SET_NULL, null=True, blank=True)
     xp = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -43,3 +42,10 @@ class DayOfWeek(models.Model):
     def __str__(self):
         return self.name
 
+
+class TimeCreatedAndUpdated(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True

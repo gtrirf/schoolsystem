@@ -32,15 +32,7 @@ urlpatterns = [
     path('api/', include('apps.timetable.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('redoc/', SpectacularRedocView.as_view(), name='schema-redoc'),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
-    path(
-        "swagger/",
-        SpectacularSwaggerView.as_view(
-            template_name="swagger-ui.html", url_name="schema"
-        ),
-        name="swagger-ui",
-    ),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

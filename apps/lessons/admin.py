@@ -20,7 +20,7 @@ class AssignmentAdmin(admin.ModelAdmin):
 
 @admin.register(Submission)
 class SubmissionAdmin(admin.ModelAdmin):
-    list_display = ('assignment', 'student', 'submitted_at', 'score', 'updated_at')
+    list_display = ('assignment', 'student', 'score', 'created_at', 'updated_at')
     search_fields = ('assignment__description', 'student__username', 'score')
-    list_filter = ('submitted_at', 'student', 'assignment__lesson__title', 'score')
-    ordering = ('-submitted_at',)
+    list_filter = ('created_at', 'student', 'assignment__lesson__title', 'score')
+    ordering = ('-created_at',)

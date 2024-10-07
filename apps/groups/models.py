@@ -1,5 +1,6 @@
 from django.db import models
 from apps.accounts.models import User
+from apps.additions.models import TimeCreatedAndUpdated
 
 
 class Grade(models.Model):
@@ -12,13 +13,11 @@ class Grade(models.Model):
         return f'{self.grade}-grade'
 
 
-class Group(models.Model):
+class Group(TimeCreatedAndUpdated):
     name = models.CharField(max_length=100)
     main_teacher = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     students = models.ManyToManyField(User, related_name='student_of_group', blank=True)
     grade = models.ForeignKey(Grade, on_delete=models.SET_NULL, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'groups'

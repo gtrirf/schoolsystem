@@ -14,23 +14,18 @@ class LessonCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         timetable = serializer.validated_data['timetable']
-
         teacher = timetable.teacher
-
         start_time = timetable.lesson_time.start_time
         end_time = timetable.lesson_time.end_time
-
         availability = TeacherAvailability.objects.filter(
             teacher=teacher,
             day_of_week=timetable.day_of_week,
             work_time__start_time__lte=start_time,
             work_time__end_time__gte=end_time
         ).exists()
-
         if not availability:
             raise ValidationError("You can't take a class at this time, "
                                   "another class conflicts or it's not your working time.")
-
         serializer.save()
 
     def get_permissions(self):
@@ -45,10 +40,8 @@ class AssignmentCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         teacher = self.request.user
         lesson = serializer.validated_data['lesson']
-
         if lesson.timetable.teacher != teacher:
             raise ValidationError("You can only create assignments for classes you have taken.")
-
         serializer.save(teacher=teacher)
 
     def get_permissions(self):
@@ -61,14 +54,11 @@ class AssignmentListView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-
         if user.is_student:
             groups = user.student_of_group.all()
             return Assignment.objects.filter(lesson__timetable__group__in=groups)
-
         elif user.is_teacher:
             return Assignment.objects.filter(teacher=user)
-
         else:
             raise ValidationError("Not authorized")
 
@@ -98,10 +88,8 @@ class SubmissionCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         student = self.request.user
         assignment = serializer.validated_data['assignment']
-
         if not assignment.lesson.timetable.group.students.filter(id=student.id).exists():
             raise ValidationError("You can only submit assignments in your group.")
-
         serializer.save(student=student)
 
     def get_permissions(self):
@@ -116,10 +104,8 @@ class SubmissionUpdateView(generics.UpdateAPIView):
     def perform_update(self, serializer):
         submission = self.get_object()
         teacher = self.request.user
-
         if submission.assignment.teacher != teacher:
             raise ValidationError("You are not authorized to update this submission.")
-
         score = self.request.data.get('score')
         if score > 60:
             rating, created = Ratings.objects.get_or_create(
@@ -127,7 +113,6 @@ class SubmissionUpdateView(generics.UpdateAPIView):
             )
             rating.xp += submission.assignment.xp_reward
             rating.save()
-
         serializer.save()
 
     def get_permissions(self):
@@ -140,15 +125,11 @@ class TeacherSubmissionListView(generics.ListAPIView):
 
     def get_queryset(self):
         teacher = self.request.user
-
         submissions = Submission.objects.filter(assignment__teacher=teacher)
-
         grouped_submission = defaultdict(list)
-
         for submission in submissions:
             group = submission.assignment.lesson.timetable.group
             grouped_submission[group].append(submission)
-
         return grouped_submission
 
         # return Submission.objects.filter(assignment__teacher=teacher)

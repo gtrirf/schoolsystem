@@ -7,11 +7,17 @@ from apps.accounts.permissions import IsStaff, IsAdmin, IsDirector, IsStudent, I
 from apps.accounts.models import User, RoleCodes
 
 
+ADMIN = RoleCodes.objects.get(code='ADMIN').code
+STAFF = RoleCodes.objects.get(code='STAFF').code
+DIRECTOR = RoleCodes.objects.get(code='DIRECTOR').code
+TEACHER = RoleCodes.objects.get(code='TEACHER').code
+STUDENT = RoleCodes.objects.get(code='STUDENT').code
+
+
 class ExamsView(APIView):
     def get(self, request):
         exam = Exam.objects.filter(group__students=request.user)
-
-        if request.user.role in [RoleCodes.ADMIN, RoleCodes.STAFF, RoleCodes.DIRECTOR, RoleCodes.TEACHER]:
+        if request.user.role in [ADMIN, STAFF, DIRECTOR, TEACHER]:
             exams = Exam.objects.all()
             serializers = ExamSerializers(exams, many=True)
             return Response(serializers.data, status=status.HTTP_200_OK)
@@ -43,11 +49,9 @@ class ExamResultView(APIView):
     def get(self, request, exam_id):
         try:
             exam = Exam.objects.get(id=exam_id)
-
-            if request.user == exam.examiner or request.user.role == RoleCodes.ADMIN:
+            if request.user == exam.examiner or request.user.role == ADMIN:
                 students = exam.group.students.all()
                 results = []
-
                 for student in students:
                     result = ExamResult.objects.filter(exam=exam, student=student).first()
                     results.append({
@@ -55,42 +59,32 @@ class ExamResultView(APIView):
                         "score": result.score if result else None,
                         "is_passed": result.is_passed if result else None
                     })
-
                 return Response(results, status=status.HTTP_200_OK)
-
-            elif request.user.role == RoleCodes.STUDENT:
+            elif request.user.role == STUDENT:
                 result = ExamResult.objects.filter(exam=exam, student=request.user).first()
-
                 if result:
                     return Response({
                         "student": request.user.get_full_name(),
                         "score": result.score,
                         "is_passed": result.is_passed
                     }, status=status.HTTP_200_OK)
-
                 return Response({"detail": "You have no results for this exam"}, status=status.HTTP_404_NOT_FOUND)
-
             return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
-
         except Exam.DoesNotExist:
             return Response({"detail": "Exam not found"}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, exam_id):
         try:
             exam = Exam.objects.get(id=exam_id)
-
-            if request.user == exam.examiner or request.user.role == RoleCodes.ADMIN:
+            if request.user == exam.examiner or request.user.role == ADMIN:
                 data = request.data.get('results', [])
-
                 for result_data in data:
                     student_id = result_data.get('student_id')
                     score = result_data.get('score')
-
                     group_student = exam.group.students.filter(id=student_id).exists()
                     if group_student:
                         student = User.objects.get(id=student_id)
                         is_passed = score >= exam.exam_passing_score
-
                         ExamResult.objects.update_or_create(
                             exam=exam,
                             student=student,
@@ -102,11 +96,8 @@ class ExamResultView(APIView):
                     else:
                         return Response({"detail": f"This exam is not for student with ID {student_id}"},
                                         status=status.HTTP_400_BAD_REQUEST)
-
                 return Response({"detail": "Exam results have been created"}, status=status.HTTP_201_CREATED)
-
             return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
-
         except Exam.DoesNotExist:
             return Response({"detail": "Exam not found"}, status=status.HTTP_404_NOT_FOUND)
         except User.DoesNotExist:

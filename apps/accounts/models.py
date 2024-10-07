@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
 from datetime import timedelta
+from apps.additions.models import TimeCreatedAndUpdated
 
 
 class UserManager(BaseUserManager):
@@ -19,7 +20,8 @@ class UserManager(BaseUserManager):
     def create_superuser(self, phone_number, password=None, **extra_fields):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('role', RoleCodes.ADMIN)
+        admin_role = RoleCodes.objects.get(code='ADMIN')
+        extra_fields.setdefault('role', admin_role.code)
 
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(print('Superuser must have is_superuser=True.'))
@@ -29,22 +31,15 @@ class UserManager(BaseUserManager):
         return self.create_user(phone_number, password, **extra_fields)
 
 
-class RoleCodes:
-    GUEST = 'guest'
-    STUDENT = 'student'
-    TEACHER = 'teacher'
-    ADMIN = 'admin'
-    STAFF = 'staff'
-    DIRECTOR = 'director'
+class RoleCodes(models.Model):
+    role = models.CharField(max_length=255, unique=True)
+    code = models.CharField(max_length=255)
 
-    CHOICES = [
-        (GUEST, 'Guest'),
-        (STUDENT, 'Student'),
-        (TEACHER,  'Teacher'),
-        (ADMIN, 'Admin'),
-        (STAFF, 'Staff'),
-        (DIRECTOR, 'Director'),
-    ]
+    class Meta:
+        db_table = 'rolecodes'
+
+    def __str__(self):
+        return f'{self.role} {self.code}'
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -56,13 +51,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
-    role = models.CharField(choices=RoleCodes.CHOICES, max_length=100, default=RoleCodes.GUEST)
-    password = models.CharField(max_length=128)
+    role = models.CharField(max_length=100, choices=[])
 
     objects = UserManager()
 
     USERNAME_FIELD = 'phone_number'
     REQUIRED_FIELDS = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._meta.get_field('role').choices = self.get_role_choices()
 
     def __str__(self):
         return (f""
@@ -70,27 +68,32 @@ class User(AbstractBaseUser, PermissionsMixin):
                 f"{self.last_name if self.last_name else self.phone_number}"
                 )
 
+    def get_role_choices(self):
+        return [(role.code, role.role) for role in RoleCodes.objects.all()]
+
     def save(self, *args, **kwargs):
-        if self.role in [RoleCodes.STAFF, RoleCodes.DIRECTOR]:
+        roles = RoleCodes.objects.filter(code__in=['STAFF', 'DIRECTOR', 'ADMIN', 'GUEST'])
+        role_dict = {role.code: role for role in roles}
+        if self.role in [role_dict['STAFF'].code, role_dict['DIRECTOR'].code]:
             self.is_staff = True
         else:
             self.is_staff = False
-        if self.role == RoleCodes.ADMIN:
+        if self.role == role_dict['ADMIN'].code:
             self.is_staff = True
             self.is_superuser = True
-
         else:
             self.is_superuser = False
+        if not self.role:
+            self.role = role_dict['GUEST'].code
         super().save(*args, **kwargs)
 
     def get_full_name(self):
         return f'{self.first_name} {self.last_name}'
 
 
-class NumberVerification(models.Model):
+class NumberVerification(TimeCreatedAndUpdated):
     phone_number = models.CharField(max_length=20)
     verification_code = models.CharField(max_length=6)
-    created_at = models.DateTimeField(auto_now_add=True)
     is_verified = models.BooleanField(default=False)
 
     def is_expired(self):

@@ -1,5 +1,4 @@
 from apps.accounts.permissions import IsTeacher, IsAdmin, IsDirector
-
 from rest_framework import viewsets
 from rest_framework.response import Response
 from .models import Attendance, Lesson, User
