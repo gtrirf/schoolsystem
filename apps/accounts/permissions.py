@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission
 from .models import Roles
+from rest_framework.exceptions import PermissionDenied
 
 
 class IsAdmin(BasePermission):
@@ -8,7 +9,8 @@ class IsAdmin(BasePermission):
     """
 
     def has_permission(self, request, view):
-        # Check if the user has the admin role
+        if request.user.is_anonymous:
+            raise PermissionDenied("You don't have any role.")
         return request.user.role.role == Roles.ADMIN
 
 
@@ -18,7 +20,8 @@ class IsGuest(BasePermission):
     """
 
     def has_permission(self, request, view):
-        # Check if the user has the guest role
+        if request.user.is_anonymous:
+            raise PermissionDenied("You don't have any role.")
         return request.user.role.role == Roles.GUEST
 
 
@@ -28,7 +31,8 @@ class IsTeacher(BasePermission):
     """
 
     def has_permission(self, request, view):
-        # Check if the user has the teacher role
+        if request.user.is_anonymous:
+            raise PermissionDenied("You don't have any role.")
         return request.user.role.role == Roles.TEACHER
 
 
@@ -38,7 +42,8 @@ class IsStudent(BasePermission):
     """
 
     def has_permission(self, request, view):
-        # Check if the user has the student role
+        if request.user.is_anonymous:
+            raise PermissionDenied("You don't have any role.")
         return request.user.role.role == Roles.STUDENT
 
 
@@ -47,6 +52,8 @@ class IsStaff(BasePermission):
     Custom permission to allow only staff users to access certain views.
     """
     def has_permission(self, request, view):
+        if request.user.is_anonymous:
+            raise PermissionDenied("You don't have any role.")
         return request.user.role.role == Roles.STAFF
 
 
@@ -55,4 +62,6 @@ class IsDirector(BasePermission):
         Custom permission to allow only directors users to access certain views.
     """
     def has_permission(self, request, view):
+        if request.user.is_anonymous:
+            raise PermissionDenied("You don't have any role.")
         return request.user.role.role == Roles.DIRECTOR

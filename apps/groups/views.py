@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from .models import Group, User
 from .serializers import AddStudentsSerializer
 from apps.accounts.permissions import IsStaff, IsAdmin, IsTeacher, IsDirector
-
+from drf_spectacular.utils import extend_schema
 
 class GroupListView(generics.ListAPIView):
     queryset = Group.objects.all()
@@ -30,6 +30,10 @@ class GroupDetailView(generics.RetrieveAPIView):
 
 
 class AddStudentsToGroupView(APIView):
+    @extend_schema(
+        request=AddStudentsSerializer,
+        responses={200: AddStudentsSerializer},
+    )
     def post(self, request, group_id):
         try:
             group = Group.objects.get(id=group_id)
@@ -51,6 +55,10 @@ class AddStudentsToGroupView(APIView):
 
 
 class RemoveStudentsFromGroupView(APIView):
+    @extend_schema(
+        request=RemoveStudentsSerializer,
+        responses={200: RemoveStudentsSerializer},
+    )
     def post(self, request, group_id):
         try:
             group = Group.objects.get(id=group_id)

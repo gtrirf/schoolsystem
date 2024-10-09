@@ -4,7 +4,7 @@ from .serializers import (
     UserPhoneNumberSerializer,
     VerifyNumberSerializer,
     UserPhoneNumberSerializer,
-    LoginSerializer, UserRegistrationSerializer
+    LoginSerializer, UserRegistrationSerializer, LogoutSerializer
 )
 from .models import NumberVerification
 from .utils import generate_verification_code, send_verification_sms
@@ -15,11 +15,16 @@ from rest_framework import status
 from django.contrib.auth import login, logout, authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample
 
 
 class PhoneNumberView(APIView):
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=UserPhoneNumberSerializer,
+        responses={200: UserPhoneNumberSerializer},
+    )
     def post(self, request):
         serializer = UserPhoneNumberSerializer(data=request.data)
         if serializer.is_valid():
@@ -105,6 +110,10 @@ class PhoneNumberView(APIView):
 class VerifySmsView(APIView):
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=VerifyNumberSerializer,
+        responses={200: VerifyNumberSerializer},
+    )
     def post(self, request):
         expiration_time = timezone.now() - timedelta(minutes=5)
         NumberVerification.objects.filter(created_at__lt=expiration_time).delete()
@@ -143,6 +152,10 @@ class VerifySmsView(APIView):
 class CompleteRegisterView(APIView):
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=UserRegistrationSerializer,
+        responses={200: UserRegistrationSerializer},
+    )
     def post(self, request):
         phone_number = request.data.get('phone_number')
         verification = NumberVerification.objects.filter(phone_number=phone_number, is_verified=True).first()
@@ -189,6 +202,10 @@ class CompleteRegisterView(APIView):
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=LoginSerializer,
+        responses={200: LoginSerializer},
+    )
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -221,9 +238,37 @@ class LoginView(APIView):
 
 
 class LogoutView(APIView):
+    @extend_schema(
+        request=LogoutSerializer,
+        responses={
+            200: OpenApiResponse(
+                description='Logged out successfully',
+                examples=[
+                    OpenApiExample(
+                        'Success',
+                        value={'detail': 'Logged out successfully'},
+                    )
+                ]
+            ),
+            400: OpenApiResponse(
+                description='Invalid request or token',
+                examples=[
+                    OpenApiExample(
+                        'Error',
+                        value={'error': 'Invalid token or other error message'},
+                    )
+                ]
+            ),
+        },
+        operation_id='logout',
+        summary='Logout the user',
+    )
     def post(self, request, *args, **kwargs):
+        serializer = LogoutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        refresh_token = serializer.validated_data['refresh']
+
         try:
-            refresh_token = request.data.get('refresh')
             token = RefreshToken(refresh_token)
             token.blacklist()
             logout(request)

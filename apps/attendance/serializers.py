@@ -9,3 +9,13 @@ class StudentAttendanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attendance
         fields = ['student', 'student_name', 'status']
+
+
+class AttendanceDetailSerializer(serializers.Serializer):
+    student = serializers.IntegerField()
+    status = serializers.BooleanField()
+
+
+class AttendancePostSerializer(serializers.Serializer):
+    lesson = serializers.IntegerField()
+    attendances = AttendanceDetailSerializer(many=True)

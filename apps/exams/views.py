@@ -1,11 +1,13 @@
 from rest_framework.views import APIView
-from .serializers import ExamSerializers
+from .serializers import ExamSerializers, ExamResultSerializers, ResultSerializer, ResultsListSerializer
 from .models import Exam, ExamResult
 from rest_framework.response import Response
 from rest_framework import status
 from apps.accounts.permissions import IsStaff, IsAdmin, IsDirector, IsStudent, IsTeacher
 from apps.accounts.models import User, RoleCodes
 from apps.accounts.tools import Roles
+from drf_spectacular.utils import extend_schema
+
 
 ADMIN = RoleCodes.objects.filter(role=Roles.ADMIN).first()
 STAFF = RoleCodes.objects.filter(role=Roles.STAFF).first()
@@ -15,6 +17,7 @@ STUDENT = RoleCodes.objects.filter(role=Roles.STUDENT).first()
 
 
 class ExamsView(APIView):
+
     def get(self, request):
         exam = Exam.objects.filter(group__students=request.user)
         if request.user.role in [ADMIN, STAFF, DIRECTOR, TEACHER]:
@@ -30,6 +33,10 @@ class ExamsView(APIView):
             status=status.HTTP_404_NOT_FOUND
         )
 
+    @extend_schema(
+        request=ExamSerializers,
+        responses={201: ExamSerializers}
+    )
     def post(self, request):
         serializers = ExamSerializers(data=request.data)
         if serializers.is_valid():
@@ -73,6 +80,10 @@ class ExamResultView(APIView):
         except Exam.DoesNotExist:
             return Response({"detail": "Exam not found"}, status=status.HTTP_404_NOT_FOUND)
 
+    @extend_schema(
+        request=ResultsListSerializer,
+        responses={201: ResultSerializer}
+    )
     def post(self, request, exam_id):
         try:
             exam = Exam.objects.get(id=exam_id)

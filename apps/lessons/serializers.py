@@ -17,5 +17,11 @@ class AssignmentSerializer(serializers.ModelSerializer):
 class SubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submission
-        read_only_fields = ['score']
+        read_only_fields = ['score', 'created_at', 'updated_at', 'student']
         fields = '__all__'
+
+
+class SubmissionUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Submission
+        fields = ['score']

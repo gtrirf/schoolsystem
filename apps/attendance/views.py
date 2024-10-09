@@ -2,13 +2,26 @@ from apps.accounts.permissions import IsTeacher, IsAdmin, IsDirector
 from rest_framework import viewsets
 from rest_framework.response import Response
 from .models import Attendance, Lesson, User
-from .serializers import StudentAttendanceSerializer
+from .serializers import StudentAttendanceSerializer, AttendancePostSerializer, AttendanceDetailSerializer
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 
 class AttendanceViewSet(viewsets.ModelViewSet):
     queryset = Attendance.objects.all()
     serializer_class = StudentAttendanceSerializer
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='lesson',
+                type=int,
+                required=False,
+                location=OpenApiParameter.QUERY,
+                description='Filter by lesson ID'
+            )
+        ],
+        responses={200: StudentAttendanceSerializer(many=True)},
+    )
     def list(self, request, *args, **kwargs):
         lesson_id = request.query_params.get('lesson')
         if not lesson_id:
@@ -30,6 +43,10 @@ class AttendanceViewSet(viewsets.ModelViewSet):
         serializer = StudentAttendanceSerializer(attendances, many=True)
         return Response(serializer.data)
 
+    @extend_schema(
+        request=AttendancePostSerializer,
+        responses={201: AttendanceDetailSerializer(many=True)},
+    )
     def create(self, request, *args, **kwargs):
         data = request.data
         lesson_id = data.get('lesson')

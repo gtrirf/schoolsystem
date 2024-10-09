@@ -1,11 +1,12 @@
 from rest_framework import generics
 from .models import Lesson, Assignment, Submission
 from apps.timetable.models import TeacherAvailability
-from .serializers import LessonSerializer, AssignmentSerializer, SubmissionSerializer
+from .serializers import LessonSerializer, AssignmentSerializer, SubmissionSerializer, SubmissionUpdateSerializer
 from rest_framework.exceptions import ValidationError
 from apps.accounts.permissions import IsTeacher, IsAdmin, IsDirector, IsStudent
 from collections import defaultdict
 from apps.additions.models import Ratings
+from ..accounts.tools import Roles
 
 
 class LessonCreateView(generics.CreateAPIView):
@@ -54,10 +55,10 @@ class AssignmentListView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_student:
+        if user.role.role == Roles.STUDENT:
             groups = user.student_of_group.all()
             return Assignment.objects.filter(lesson__timetable__group__in=groups)
-        elif user.is_teacher:
+        elif user.role.role == Roles.TEACHER:
             return Assignment.objects.filter(teacher=user)
         else:
             raise ValidationError("Not authorized")
@@ -99,7 +100,7 @@ class SubmissionCreateView(generics.CreateAPIView):
 
 class SubmissionUpdateView(generics.UpdateAPIView):
     queryset = Submission.objects.all()
-    serializer_class = SubmissionSerializer
+    serializer_class = SubmissionUpdateSerializer
 
     def perform_update(self, serializer):
         submission = self.get_object()
@@ -125,14 +126,15 @@ class TeacherSubmissionListView(generics.ListAPIView):
 
     def get_queryset(self):
         teacher = self.request.user
-        submissions = Submission.objects.filter(assignment__teacher=teacher)
-        grouped_submission = defaultdict(list)
-        for submission in submissions:
-            group = submission.assignment.lesson.timetable.group
-            grouped_submission[group].append(submission)
-        return grouped_submission
+        # submissions = Submission.objects.filter(assignment__teacher=teacher)
+        # grouped_submission = defaultdict(list)
+        # for submission in submissions:
+        #     group = submission.assignment.lesson.timetable.group
+        #     grouped_submission[group].append(submission)
+        # return grouped_submission
 
-        # return Submission.objects.filter(assignment__teacher=teacher)
+        return Submission.objects.filter(assignment__teacher=teacher)
+    
     def get_permissions(self):
         self.permission_classes = [IsTeacher | IsAdmin | IsDirector]
         return super().get_permissions()

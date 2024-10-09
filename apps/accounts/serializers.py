@@ -25,14 +25,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         if data['password'] != data['password_confirm']:
             raise serializers.ValidationError("Passwords do not match.")
         return data
-        # try:
-        #     verification = NumberVerification.objects.get(phone_number=data['phone_number'])
-        #     if not verification.is_verified:
-        #         raise serializers.ValidationError("Phone number is not verified.")
-        # except NumberVerification.DoesNotExist:
-        #     raise serializers.ValidationError("Phone number not found.")
-        #
-        # return data
 
     def create(self, validated_data):
         validated_data.pop('password_confirm')
@@ -49,3 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'username', 'phone_number', 'profile_photo', 'role',]
+
+
+class LogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField(required=True, help_text='Refresh token to be blacklisted.')
