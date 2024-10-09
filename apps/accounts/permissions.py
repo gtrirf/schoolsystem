@@ -1,56 +1,58 @@
-from rest_framework import permissions
-from .models import RoleCodes
+from rest_framework.permissions import BasePermission
+from .models import Roles
 
 
-class IsGuest(permissions.BasePermission):
+class IsAdmin(BasePermission):
     """
-    Allows access only to users with the 'guest' role.
-    """
-
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == RoleCodes.objects.get(code='GUEST').code
-
-
-class IsAdmin(permissions.BasePermission):
-    """
-    Allows access only to users with the 'admin' role.
+    Custom permission to only allow admin users to access certain views.
     """
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == RoleCodes.objects.get(code='ADMIN').code
+        # Check if the user has the admin role
+        return request.user.role.role == Roles.ADMIN
 
 
-class IsStaff(permissions.BasePermission):
+class IsGuest(BasePermission):
     """
-    Allows access to 'staff' users.
-    """
-
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == RoleCodes.objects.get(code='STAFF').code
-
-
-class IsStudent(permissions.BasePermission):
-    """
-    Allow access to 'student' users.
+    Custom permission to allow only guest users to access certain views.
     """
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == RoleCodes.objects.get(code='STUDENT').code
+        # Check if the user has the guest role
+        return request.user.role.role == Roles.GUEST
 
 
-class IsTeacher(permissions.BasePermission):
+class IsTeacher(BasePermission):
     """
-    Allow access to 'teacher' users.
-    """
-
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == RoleCodes.objects.get(code='TEACHER').code
-
-
-class IsDirector(permissions.BasePermission):
-    """
-    Allow access to 'director' users.
+    Custom permission to allow only teacher users to access certain views.
     """
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == RoleCodes.objects.get(code='DIRECTOR').code
+        # Check if the user has the teacher role
+        return request.user.role.role == Roles.TEACHER
+
+
+class IsStudent(BasePermission):
+    """
+    Custom permission to allow only student users to access certain views.
+    """
+
+    def has_permission(self, request, view):
+        # Check if the user has the student role
+        return request.user.role.role == Roles.STUDENT
+
+
+class IsStaff(BasePermission):
+    """
+    Custom permission to allow only staff users to access certain views.
+    """
+    def has_permission(self, request, view):
+        return request.user.role.role == Roles.STAFF
+
+
+class IsDirector(BasePermission):
+    """
+        Custom permission to allow only directors users to access certain views.
+    """
+    def has_permission(self, request, view):
+        return request.user.role.role == Roles.DIRECTOR

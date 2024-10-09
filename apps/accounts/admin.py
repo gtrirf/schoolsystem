@@ -28,4 +28,4 @@ admin.site.register(NumberVerification, NumberVerificationAdmin)
 
 @admin.register(RoleCodes)
 class RoleCodesAdmin(admin.ModelAdmin):
-    list_display = ('role', 'code')
+    list_display = ('role', )

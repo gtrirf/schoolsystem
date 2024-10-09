@@ -5,13 +5,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from apps.accounts.permissions import IsStaff, IsAdmin, IsDirector, IsStudent, IsTeacher
 from apps.accounts.models import User, RoleCodes
+from apps.accounts.tools import Roles
 
-
-ADMIN = RoleCodes.objects.get(code='ADMIN').code
-STAFF = RoleCodes.objects.get(code='STAFF').code
-DIRECTOR = RoleCodes.objects.get(code='DIRECTOR').code
-TEACHER = RoleCodes.objects.get(code='TEACHER').code
-STUDENT = RoleCodes.objects.get(code='STUDENT').code
+ADMIN = RoleCodes.objects.filter(role=Roles.ADMIN).first()
+STAFF = RoleCodes.objects.filter(role=Roles.STAFF).first()
+DIRECTOR = RoleCodes.objects.filter(role=Roles.DIRECTOR).first()
+TEACHER = RoleCodes.objects.filter(role=Roles.TEACHER).first()
+STUDENT = RoleCodes.objects.filter(role=Roles.STUDENT).first()
 
 
 class ExamsView(APIView):

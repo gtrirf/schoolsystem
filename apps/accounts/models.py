@@ -1,14 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 from datetime import timedelta
 from apps.additions.models import TimeCreatedAndUpdated
+from .tools import Roles, CHOICES
 
 
 class UserManager(BaseUserManager):
     def create_user(self, phone_number, password=None, **extra_fields):
         if not phone_number:
             raise ValueError('The phone number field is required')
+
         user = self.model(
             phone_number=phone_number,
             **extra_fields
@@ -20,8 +23,8 @@ class UserManager(BaseUserManager):
     def create_superuser(self, phone_number, password=None, **extra_fields):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_staff', True)
-        admin_role = RoleCodes.objects.get(code='ADMIN')
-        extra_fields.setdefault('role', admin_role.code)
+        admin_role = RoleCodes.objects.get(role=Roles.ADMIN)
+        extra_fields.setdefault('role', admin_role)
 
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(print('Superuser must have is_superuser=True.'))
@@ -32,14 +35,13 @@ class UserManager(BaseUserManager):
 
 
 class RoleCodes(models.Model):
-    role = models.CharField(max_length=255, unique=True)
-    code = models.CharField(max_length=255)
+    role = models.CharField(max_length=255, choices=CHOICES, unique=True)
 
     class Meta:
         db_table = 'rolecodes'
 
     def __str__(self):
-        return f'{self.role} {self.code}'
+        return f'{self.role}'
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -51,16 +53,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
-    role = models.CharField(max_length=100, choices=[])
+    role = models.ForeignKey(RoleCodes, on_delete=models.SET_NULL, null=True, blank=True)
 
     objects = UserManager()
 
     USERNAME_FIELD = 'phone_number'
     REQUIRED_FIELDS = []
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._meta.get_field('role').choices = self.get_role_choices()
 
     def __str__(self):
         return (f""
@@ -68,23 +66,13 @@ class User(AbstractBaseUser, PermissionsMixin):
                 f"{self.last_name if self.last_name else self.phone_number}"
                 )
 
-    def get_role_choices(self):
-        return [(role.code, role.role) for role in RoleCodes.objects.all()]
-
     def save(self, *args, **kwargs):
-        roles = RoleCodes.objects.filter(code__in=['STAFF', 'DIRECTOR', 'ADMIN', 'GUEST'])
-        role_dict = {role.code: role for role in roles}
-        if self.role in [role_dict['STAFF'].code, role_dict['DIRECTOR'].code]:
-            self.is_staff = True
-        else:
-            self.is_staff = False
-        if self.role == role_dict['ADMIN'].code:
-            self.is_staff = True
-            self.is_superuser = True
-        else:
-            self.is_superuser = False
         if not self.role:
-            self.role = role_dict['GUEST'].code
+            try:
+                guest_role = RoleCodes.objects.get(role=Roles.GUEST)
+                self.role = guest_role
+            except RoleCodes.DoesNotExist:
+                raise ValueError("Guest role does not exist.")
         super().save(*args, **kwargs)
 
     def get_full_name(self):
