@@ -7,18 +7,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-# schema_view = get_schema_view(
-#     openapi.Info(
-#         title="My API",
-#         default_version='v1',
-#         description="My API description",
-#         terms_of_service="https://www.example.com/terms/",
-#         contact=openapi.Contact(email="contact@example.com"),
-#         license=openapi.License(name="Awesome License"),
-#     ),
-#     public=True,
-#     permission_classes=(permissions.AllowAny,),
-# )
 
 urlpatterns = [
     path('admin/', admin.site.urls),

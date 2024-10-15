@@ -29,3 +29,10 @@ def send_verification_sms(to_phone_number, message_body):
     except Exception as e:
         print(f"Exception occurred: {e}")
 
+
+def send_verification_sms_with_error_handling(phone_number, message):
+    try:
+        send_verification_sms(phone_number, message)
+        return True
+    except Exception:
+        return False

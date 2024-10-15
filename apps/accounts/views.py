@@ -7,7 +7,7 @@ from .serializers import (
     LoginSerializer, UserRegistrationSerializer, LogoutSerializer
 )
 from .models import NumberVerification
-from .utils import generate_verification_code, send_verification_sms
+from .utils import generate_verification_code, send_verification_sms, send_verification_sms_with_error_handling
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework.response import Response
@@ -31,12 +31,11 @@ class PhoneNumberView(APIView):
             phone_number = serializer.validated_data['phone_number']
             verification_code = generate_verification_code()
             verification = NumberVerification.objects.filter(phone_number=phone_number).first()
-            user_exists = User.objects.filter(phone_number=phone_number).first()
-
             current_time = timezone.now()
-            if user_exists:
+            if User.objects.filter(phone_number=phone_number).exists():
                 return Response(
-                    {'detail': "There is already a registered user for this number"}
+                    {'detail': "There is already a registered user for this number"},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
             elif verification:
                 five_minute_expiration = verification.created_at + timedelta(minutes=5)
@@ -47,15 +46,11 @@ class PhoneNumberView(APIView):
                         verification_code=verification_code,
                     )
                     message = f'Your verification code is {verification_code}'
-                    send_verification_sms(phone_number, message)
-
-                    # try:
-                    #     send_verification_sms(phone_number, message)
-                    # except Exception as e:
-                    #     return Response(
-                    #         {'error': "Failed to send verification SMS"},
-                    #         status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                    #     )
+                    if not send_verification_sms_with_error_handling(phone_number, message):
+                        return Response(
+                            {'error': "error sending sms"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                        )
                     return Response(
                         {'message': 'Verification code is sent'},
                         status=status.HTTP_200_OK
@@ -66,40 +61,31 @@ class PhoneNumberView(APIView):
                     verification.save()
 
                     message = f'your Verification code is {verification_code}'
-                    send_verification_sms(phone_number, message)
-
-                    # try:
-                    #     send_verification_sms(phone_number, message)
-                    # except Exception as e:
-                    #     return Response(
-                    #         {'error': 'Failed to send verification SMS'},
-                    #         status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                    #     )
+                    if not send_verification_sms_with_error_handling(phone_number, message):
+                        return Response(
+                            {'error': "error sending sms"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                        )
                     return Response(
                         {'message': 'New Verification code sent'},
                         status=status.HTTP_200_OK
                     )
-
                 else:
                     return Response(
-                        {'detail': 'You can only send a verification SMS once in one minute'}
+                        {'detail': 'You can only send a verification SMS once in one minute'},
+                        status=status.HTTP_400_BAD_REQUEST
                     )
-
             else:
                 NumberVerification.objects.create(
                     phone_number=phone_number,
                     verification_code=verification_code,
                 )
                 message = f'Your verification code is {verification_code}'
-                send_verification_sms(phone_number, message)
-
-                # try:
-                #     send_verification_sms(phone_number, message)
-                # except Exception as e:
-                #     return Response(
-                #         {'error': "Failed to send verification SMS"},
-                #         status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                #     )
+                if not send_verification_sms_with_error_handling(phone_number, message):
+                    return Response(
+                        {'error': "error sending sms"},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
                 return Response(
                     {'message': 'Verification code is sent'},
                     status=status.HTTP_200_OK
@@ -222,7 +208,7 @@ class LoginView(APIView):
 
                 return Response(
                     {
-                        'messages': 'Login successful',
+                        'message': 'Login successful',
                         'access_token': access_token,
                         'refresh_token': refresh_token
                     },

@@ -47,7 +47,7 @@ class RoleCodes(models.Model):
 class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=255, null=True, blank=True)
     last_name = models.CharField(max_length=255, null=True, blank=True)
-    phone_number = models.CharField(max_length=15, unique=True)
+    phone_number = models.CharField(max_length=30, unique=True)
     username = models.CharField(max_length=150, blank=True, null=True, unique=True)
     profile_photo = models.ImageField(upload_to='user_images/', default='default_img/img.png')
     is_active = models.BooleanField(default=True)
