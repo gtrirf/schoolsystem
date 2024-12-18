@@ -2,14 +2,13 @@ import pytest
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework import status
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient   
 from apps.accounts.models import NumberVerification
 from apps.accounts.serializers import VerifyNumberSerializer
 
 
 @pytest.mark.django_db
 class TestVerifySmsView:
-
     def create_verification(self, phone_number, verification_code, is_verified=False):
         return NumberVerification.objects.create(
             phone_number=phone_number,

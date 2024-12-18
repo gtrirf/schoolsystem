@@ -2,14 +2,15 @@ import pytest
 from rest_framework import status
 from faker import Faker
 from apps.accounts.models import User, NumberVerification, RoleCodes
-from tests.conftest import api_client, guest_user, verification_code_expired, verification_code_recent
 
 fake = Faker()
+
+base_url = '/accounts/phone-number/'
 
 
 @pytest.mark.django_db
 def test_send_verification_to_new_number(api_client):
-    url = '/accounts/phone-number/'
+    url = base_url
     data = {'phone_number': fake.phone_number()[:15]}
 
     response = api_client.post(url, data, format='json')
@@ -22,7 +23,7 @@ def test_send_verification_to_new_number(api_client):
 
 @pytest.mark.django_db
 def test_send_verification_to_registered_number(api_client, guest_user):
-    url = '/accounts/phone-number/'
+    url = base_url
     data = {'phone_number': guest_user.phone_number}
 
     response = api_client.post(url, data, format='json')
@@ -34,7 +35,7 @@ def test_send_verification_to_registered_number(api_client, guest_user):
 
 @pytest.mark.django_db
 def test_send_verification_recent_code(api_client, verification_code_recent):
-    url = '/accounts/phone-number/'
+    url = base_url
     data = {'phone_number': verification_code_recent.phone_number}
 
     response = api_client.post(url, data, format='json')
@@ -46,7 +47,7 @@ def test_send_verification_recent_code(api_client, verification_code_recent):
 
 @pytest.mark.django_db
 def test_send_verification_expired_code(api_client, verification_code_expired):
-    url = '/accounts/phone-number/'
+    url = base_url
     data = {'phone_number': verification_code_expired.phone_number}
 
     response = api_client.post(url, data, format='json')

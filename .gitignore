@@ -1,8 +1,10 @@
 .env
 env
 .idea
+venv
 __pycache__
 db.sqlite3
 
 **/migrations/*.py
 !**/migrations/__init__.py
+sys

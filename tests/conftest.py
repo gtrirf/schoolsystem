@@ -6,9 +6,65 @@ from faker import Faker
 from apps.accounts.models import User, RoleCodes, NumberVerification
 from apps.accounts.tools import Roles
 from datetime import timedelta
-from django.contrib.auth.hashers import make_password
+from rest_framework_simplejwt.tokens import RefreshToken
+from apps.timetable.models import TimeTableForLesson
+from apps.groups.models import Group
+from apps.additions.models import Subject, DayOfWeek, Timeslot
+from apps.events.models import Event
+from apps.groups.models import Classroom
 
 fake = Faker()
+
+
+@pytest.fixture
+def classroom(self):
+    return Classroom.objects.create(name="Room A")
+
+
+@pytest.fixture
+def timeslot_for_event(self):
+    return Timeslot.objects.create(start_time="10:00", end_time="11:00")
+
+
+@pytest.fixture
+def event(self, classroom, timeslot):
+    return Event.objects.create(
+        event_name="Test Event",
+        date="2024-10-20",
+        event_room=classroom,
+        event_time=timeslot
+    )
+
+
+@pytest.fixture
+def group(db):
+    return Group.objects.create(name="Test Group")  # Adjust fields as necessary
+
+
+@pytest.fixture
+def subject(db):
+    return Subject.objects.create(subject_name="Mathematics")  # Adjust fields as necessary
+
+
+@pytest.fixture
+def day_of_week(db):
+    return DayOfWeek.objects.create(name="Monday")  # Adjust fields as necessary
+
+
+@pytest.fixture
+def timeslot(db):
+    return Timeslot.objects.create(start_time="09:00", end_time="10:00")  # Adjust fields as necessary
+
+
+@pytest.fixture
+def timetable(db, group, subject, day_of_week, timeslot):
+    return TimeTableForLesson.objects.create(
+        group=group,
+        subject=subject,
+        teacher=User.objects.create_user(phone_number="teacher@example.com", password="password", role=RoleCodes.objects.get(role=Roles.TEACHER)),
+        day_of_week=day_of_week,
+        lesson_time=timeslot
+    )
 
 
 @pytest.fixture
@@ -83,10 +139,11 @@ def staff_user(db, create_roles):
 @pytest.fixture
 def admin_user(db, create_roles):
     phone_number = fake.phone_number()[:15]
+    role = RoleCodes.objects.get(role=Roles.ADMIN)
     return User.objects.create_user(
         phone_number=phone_number,
         password=fake.password(),
-        role=RoleCodes.objects.get(role=Roles.ADMIN)
+        role=role
     )
 
 
@@ -133,8 +190,19 @@ def register_user(create_verified_number):
         create_verified_number(phone_number)
         user = User.objects.create_user(
             phone_number=phone_number,
-            username='testuser',
+            username=fake.name(),
             password='password123'
         )
         return user
     return _register_user
+
+
+@pytest.fixture
+def authenticated_client(self, api_client, create_roles, register_user):
+    phone_number = '123123'
+    user = register_user(phone_number)
+    refresh = RefreshToken.for_user(user)
+    api_client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
+    return api_client, refresh
+
+
